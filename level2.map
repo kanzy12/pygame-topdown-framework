@@ -1,10 +1,10 @@
 [level]
 tileset = images/tileset.png
 map = ##########
-      #.......P#
-      #...P#...#
+      #..####..#
+      #P...#...#
       #...##...#
-      #P#.P...G#
+      ###.P..#G#
       ##########
       
 [.]
@@ -24,4 +24,3 @@ goal = true
 
 [P]
 name = player
-

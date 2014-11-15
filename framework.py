@@ -19,11 +19,17 @@ class Controller(pygame.sprite.Sprite):
 
         for coordinate in self.playerpositions:
             self.players.append(Player(grid*coordinate[0],grid*coordinate[1],255/self.playercount))
+            
+        print self.level.goal
 
     def move_check(self,player):
         if not(self.level.is_wall(player.dx/grid,player.dy/grid)):
             player.nx = player.dx
             player.ny = player.dy
+            
+            #check if it's goal
+            if player.nx/grid == self.level.goal[0] and player.ny/grid == self.level.goal[1]:
+                self.complete = True
         else:
             player.dx = player.rect.x
             player.dy = player.rect.y
@@ -139,14 +145,13 @@ def event_loop():
     score = 0
 
     #initialize the level
-
+    current_level = 1
     controller = Controller(1)
-    playerlist = controller.players
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
     sprite_list = pygame.sprite.Group()
-    for player in playerlist:
+    for player in controller.players:
         sprite_list.add(player)
 
     # main game loop
@@ -158,12 +163,22 @@ def event_loop():
                 sys.exit()
 
             elif event.type == pygame.KEYDOWN:
-                for player in playerlist:
+                for player in controller.players:
                     player.keyboardhandler(event.key)
 
-        for player in playerlist:
+        for player in controller.players:
             controller.move_check(player)
             player.move()
+        
+        if controller.complete:
+            for player in controller.players:
+                sprite_list.remove(player)
+            current_level += 1
+            controller = Controller(current_level)
+            for player in controller.players:
+                sprite_list.add(player)
+                  
+            continue
         
         # black background
         screen.fill((0, 0, 0))
