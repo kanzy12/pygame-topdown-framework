@@ -3,7 +3,6 @@ import sys
 import os
 from menu import *
 
-# Aswin was here 123
 
 class Player(pygame.sprite.Sprite):
     # constructor for this class
