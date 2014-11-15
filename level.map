@@ -1,0 +1,16 @@
+[level]
+tileset = images/tileset.png
+map = ####
+      #..#
+      #..#
+      ####
+      
+[.]
+name = floor
+tile = 0, 0
+
+[#]
+name = wall
+tile = 0, 1
+wall = true
+block = true
