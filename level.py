@@ -60,6 +60,8 @@ class Level(object):
             for map_x, c in enumerate(line):
                 if self.is_wall(map_x, map_y):
                     tile = 0, 1
+                elif self.get_bool(map_x, map_y, "goal"):
+                    tile = 0, 2
                 else:
                     #it's ground
                     tile = 0, 0
