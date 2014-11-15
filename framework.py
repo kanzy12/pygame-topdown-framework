@@ -139,15 +139,9 @@ def event_loop():
     score = 0
 
     #initialize the level
-<<<<<<< HEAD
-    controller = Controller(1)
 
-    # initialize the player and the enemy
-    playerlist = [ Player(50,50,255/3), Player(150,50,255/3), Player(50,150,255/3) ]
-=======
-    controller = Controller()
+    controller = Controller(1)
     playerlist = controller.players
->>>>>>> be321c1378b33773fdada52c5c4e65fb35868e15
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
