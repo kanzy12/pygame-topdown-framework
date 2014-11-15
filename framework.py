@@ -14,7 +14,7 @@ class Controller(pygame.sprite.Sprite):
         level_string = "level" + str(level_num) + ".map"
         self.complete = False
         self.players = []
-        self.playerpositions = self.level.load_file(level_string)
+        self.playerpositions, self.time = self.level.load_file(level_string)
         self.playercount = len(self.playerpositions)
 
         for coordinate in self.playerpositions:
@@ -37,7 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface((50, 50))
         # color the surface cyan
         self.image.fill((0, 205, 205))
-#        self.image = pygame.image.load(os.path.join('images', 'ball.png'))
+        #self.image = pygame.image.load(os.path.join('images', 'ball.png'))
         self.rect = self.image.get_rect()
         self.image.set_alpha(alpha)
         #define self variables
@@ -170,11 +170,16 @@ def event_loop():
         background = controller.level.render()
         screen.blit(background,(0,0))    
 
-        # set up the score text
-        text = basicFont.render('Score: %d' % score, True, (255, 255, 255))
+        # display the timer on the bottom left
+        if controller.time > 0:
+            controller.time -= 0.02222222222
+        else:
+            controller.time = 0
+
+        text = basicFont.render('Time: %d' % math.ceil(controller.time), True, (255, 255, 255))
         textRect = text.get_rect()
-        textRect.centerx = screen_rect.centerx
-        textRect.centery = screen_rect.centery
+        textRect.left = 4
+        textRect.bottom = screen_rect.height
         
         # draw the text onto the surface
         screen.blit(text, textRect)

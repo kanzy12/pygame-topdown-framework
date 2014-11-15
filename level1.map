@@ -6,7 +6,10 @@ map = ##########
       #...##...#
       #P#.P...G#
       ##########
-      
+
+[t]
+time = 20
+     
 [.]
 name = floor
 tile = 0, 0
@@ -24,4 +27,3 @@ goal = true
 
 [P]
 name = player
-

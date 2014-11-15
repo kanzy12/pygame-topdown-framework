@@ -40,7 +40,7 @@ class Level(object):
                 rect = (tile_x * self.tile_width, tile_y * self.tile_height, self.tile_width, self.tile_height)
                 line.append(image.subsurface(rect))
         
-        return self.players
+        return self.players, int(self.key["t"]["time"])
         
     def get_tile(self, x, y):
         char = self.map[y][x]
