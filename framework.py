@@ -1,13 +1,32 @@
 import pygame
+import math
 import sys
 import os
 from menu import *
 
 # Aswin was here 123
 
+enemy_speed = [6, 6]
+
+class Controller(pygame.sprite.Sprite):
+    #def __init__(self):
+
+    def moveCheck(self,player):
+        if not(self.isWall(player.dx,player.dy)):
+            player.nx = player.dx
+            player.ny = player.dy
+        else:
+            player.dx = player.rect.x
+            player.dy = player.rect.y
+
+    def isWall(self,x,y):
+        if (x==50)and(y==50):
+            return True
+        return False
+
 class Player(pygame.sprite.Sprite):
     # constructor for this class
-    def __init__(self):
+    def __init__(self,inx,iny,alpha):
         # call the parent class (Sprite) constructor
         pygame.sprite.Sprite.__init__(self)
         # create 50px by 50px surface
@@ -15,24 +34,71 @@ class Player(pygame.sprite.Sprite):
         # color the surface cyan
         self.image.fill((0, 205, 205))
         self.rect = self.image.get_rect()
-        self.speed = [0, 0]
+        self.image.set_alpha(alpha)
+        #define self variables
+        self.rect.x = inx
+        self.rect.y = iny
+        self.nx = self.rect.x
+        self.ny = self.rect.y
+        self.dx = self.rect.x
+        self.dy = self.rect.y
+        self.myspeed = 10
+        self.grid = 50
+        self.moving = False
 
     def left(self):
-        self.speed[0] -= 8
+        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+            self.dx = self.rect.x - self.grid
 
     def right(self):
-        self.speed[0] += 8
+        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+            self.dx = self.rect.x + self.grid
 
     def up(self):
-        self.speed[1] -= 8
+        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+            self.dy = self.rect.y - self.grid
 
     def down(self):
-        self.speed[1] += 8
+        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+            self.dy = self.rect.y + self.grid
 
     def move(self):
-        # move the rect by the displacement ("speed")
-        self.rect = self.rect.move(self.speed)
 
+        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+            self.moving = False
+
+        if (self.rect.x < self.nx):
+            self.rect.x += self.myspeed
+        if (self.rect.x > self.nx):
+            self.rect.x -= self.myspeed
+        if (self.rect.y < self.ny):
+            self.rect.y += self.myspeed
+        if (self.rect.y > self.ny):
+            self.rect.y -= self.myspeed
+
+        if (abs(self.rect.x - self.nx) < self.myspeed):
+            self.rect.x = self.nx
+        if (abs(self.rect.y - self.ny) < self.myspeed):
+            self.rect.y = self.ny
+
+#        if not((self.nx % self.grid) == 0):
+#            self.nx = math.floor(self.nx/self.grid)*self.grid
+#            self.rect.x = self.nx
+#        if not((self.ny % self.grid) == 0):
+#            self.ny = math.floor(self.ny/self.grid)*self.grid
+#            self.rect.y = self.ny
+
+    def keyboardhandler(self,key):
+        if self.moving == False:
+            if key == pygame.K_LEFT:
+                self.left()
+            elif key == pygame.K_RIGHT:
+                self.right()
+            elif key == pygame.K_UP:
+                self.up()
+            elif key == pygame.K_DOWN:
+                self.down()
+            self.moving = True
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
@@ -42,6 +108,18 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = 0, 0
 
+class Wall(pygame.sprite.Sprite):
+    def __init__(self,inx,iny):
+        # call the parent class (Sprite) constructor
+        pygame.sprite.Sprite.__init__(self)
+        # create 50px by 50px surface
+        self.image = pygame.Surface((50, 50))
+        # color the surface cyan
+        self.image.fill((200, 200, 200))
+        self.rect = self.image.get_rect()
+        #define self variables
+        self.rect.x = inx;
+        self.rect.y = iny;
 
 def event_loop():
     # get the pygame screen and create some local vars
@@ -55,17 +133,21 @@ def event_loop():
     clock = pygame.time.Clock()
     # initialize the score counter
     score = 0
-    # initialize the enemy speed
-    enemy_speed = [6, 6]
     
     # initialize the player and the enemy
-    player = Player()
+    controller = Controller()
+    playerlist = [ Player(0,0,255/4) , Player(250,100,255/4) , Player(50,100,255/4), Player(200,50,255/4) ]
+    walllist = [ Wall(50,50) ]#, Wall(250,50), Wall(150,250), Wall(200,0), Wall(100,100) ]
+
     enemy = Enemy()
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
     sprite_list = pygame.sprite.Group()
-    sprite_list.add(player)
+    for player in playerlist:
+        sprite_list.add(player)
+    for wall in walllist:
+        sprite_list.add(wall)
     sprite_list.add(enemy)
 
     # create a sprite group for enemies only to detect collisions
@@ -80,38 +162,19 @@ def event_loop():
                 sys.exit()
 
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    player.left()
-                elif event.key == pygame.K_RIGHT:
-                    player.right()
-                elif event.key == pygame.K_UP:
-                    player.up()
-                elif event.key == pygame.K_DOWN:
-                    player.down()
+                for player in playerlist:
+                    player.keyboardhandler(event.key)
 
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    player.right()
-                elif event.key == pygame.K_RIGHT:
-                    player.left()
-                elif event.key == pygame.K_UP:
-                    player.down()
-                elif event.key == pygame.K_DOWN:
-                    player.up()
+        for player in playerlist:
+            controller.moveCheck(player)
+            player.move()
+
+            # detect all collisions between the player and enemy
+            # but don't remove enemy after collisions
+            # increment score if there was a collision
+            if pygame.sprite.spritecollide(player, enemy_list, False):
+                score += 1
         
-        # call the move function for the player
-        player.move()
-
-        # check player bounds
-        if player.rect.left < 0:
-            player.rect.left = 0
-        if player.rect.right > screen_width:
-            player.rect.right = screen_width
-        if player.rect.top < 0:
-            player.rect.top = 0
-        if player.rect.bottom > screen_height:
-            player.rect.bottom = screen_height
-
         # reverse the movement direction if enemy goes out of bounds
         if enemy.rect.left < 0 or enemy.rect.right > screen_width:
             enemy_speed[0] = -enemy_speed[0]
@@ -122,11 +185,6 @@ def event_loop():
         enemy.rect.x += enemy_speed[0]
         enemy.rect.y += enemy_speed[1]
 
-        # detect all collisions between the player and enemy
-        # but don't remove enemy after collisions
-        # increment score if there was a collision
-        if pygame.sprite.spritecollide(player, enemy_list, False):
-            score += 1
 
         # black background
         screen.fill((0, 0, 0))
