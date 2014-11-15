@@ -21,6 +21,9 @@ class Level(object):
             for j in xrange(self.height):
                 if (self.map[j][i] == "P"):
                     self.players.append([i,j])
+                    
+                if (self.map[j][i] == "G"):
+                    self.goal = i, j
        
         for section in parser.sections():
             if len(section) == 1:
