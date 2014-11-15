@@ -7,20 +7,26 @@ import pygame.locals
 class Level(object):
     def load_file(self, filename):
         self.map = []
+        self.players = []
         self.key = {}
         parser = ConfigParser.ConfigParser()
         parser.read(filename)
         self.tileset = parser.get("level", "tileset")
         self.map = parser.get("level", "map").split("\n")
-        
+
+        self.width = len(self.map[0])
+        self.height = len(self.map)
+
+        for i in xrange(self.width):
+            for j in xrange(self.height):
+                if (self.map[j][i] == "P"):
+                    self.players.append([i,j])
+       
         for section in parser.sections():
             if len(section) == 1:
                 desc = dict(parser.items(section))
                 self.key[section] = desc
-                
-        self.width = len(self.map[0])
-        self.height = len(self.map)
-        
+                        
         self.tile_height = 50;
         self.tile_width = 50;
         
@@ -34,6 +40,7 @@ class Level(object):
                 rect = (tile_x * self.tile_width, tile_y * self.tile_height, self.tile_width, self.tile_height)
                 line.append(image.subsurface(rect))
         
+        return self.players
         
     def get_tile(self, x, y):
         char = self.map[y][x]

@@ -12,8 +12,13 @@ class Controller(pygame.sprite.Sprite):
     def __init__(self, level_num):
         self.level = Level()
         level_string = "level" + str(level_num) + ".map"
-        self.level.load_file(level_string)
         self.complete = False
+        self.players = []
+        self.playerpositions = self.level.load_file(level_string)
+        self.playercount = len(self.playerpositions)
+
+        for coordinate in self.playerpositions:
+            self.players.append(Player(grid*coordinate[0],grid*coordinate[1],255/self.playercount))
 
     def move_check(self,player):
         if not(self.level.is_wall(player.dx/grid,player.dy/grid)):
@@ -32,6 +37,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface((50, 50))
         # color the surface cyan
         self.image.fill((0, 205, 205))
+#        self.image = pygame.image.load(os.path.join('images', 'ball.png'))
         self.rect = self.image.get_rect()
         self.image.set_alpha(alpha)
         #define self variables
@@ -133,10 +139,15 @@ def event_loop():
     score = 0
 
     #initialize the level
+<<<<<<< HEAD
     controller = Controller(1)
 
     # initialize the player and the enemy
     playerlist = [ Player(50,50,255/3), Player(150,50,255/3), Player(50,150,255/3) ]
+=======
+    controller = Controller()
+    playerlist = controller.players
+>>>>>>> be321c1378b33773fdada52c5c4e65fb35868e15
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
