@@ -9,9 +9,11 @@ grid = 50
 enemy_speed = [6, 6]
 
 class Controller(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, level_num):
         self.level = Level()
-        self.level.load_file("level.map")
+        level_string = "level" + str(level_num) + ".map"
+        self.level.load_file(level_string)
+        self.complete = False
 
     def move_check(self,player):
         if not(self.level.is_wall(player.dx/grid,player.dy/grid)):
@@ -131,7 +133,7 @@ def event_loop():
     score = 0
 
     #initialize the level
-    controller = Controller()
+    controller = Controller(1)
 
     # initialize the player and the enemy
     playerlist = [ Player(50,50,255/3), Player(150,50,255/3), Player(50,150,255/3) ]
