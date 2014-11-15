@@ -2,25 +2,24 @@ import pygame
 import math
 import sys
 import os
+from level import *
 from menu import *
 
+grid = 50
 enemy_speed = [6, 6]
 
 class Controller(pygame.sprite.Sprite):
-    #def __init__(self):
+    def __init__(self):
+        self.level = Level()
+        self.level.load_file("level.map")
 
-    def moveCheck(self,player):
-        if not(self.isWall(player.dx,player.dy)):
+    def move_check(self,player):
+        if not(self.level.is_wall(player.dx/grid,player.dy/grid)):
             player.nx = player.dx
             player.ny = player.dy
         else:
             player.dx = player.rect.x
             player.dy = player.rect.y
-
-    def isWall(self,x,y):
-        if (x==50)and(y==50):
-            return True
-        return False
 
 class Player(pygame.sprite.Sprite):
     # constructor for this class
@@ -41,24 +40,23 @@ class Player(pygame.sprite.Sprite):
         self.dx = self.rect.x
         self.dy = self.rect.y
         self.myspeed = 10
-        self.grid = 50
         self.moving = False
 
     def left(self):
         if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dx = self.rect.x - self.grid
+            self.dx = self.rect.x - grid
 
     def right(self):
         if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dx = self.rect.x + self.grid
+            self.dx = self.rect.x + grid
 
     def up(self):
         if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dy = self.rect.y - self.grid
+            self.dy = self.rect.y - grid
 
     def down(self):
         if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dy = self.rect.y + self.grid
+            self.dy = self.rect.y + grid
 
     def move(self):
 
@@ -131,29 +129,22 @@ def event_loop():
     clock = pygame.time.Clock()
     # initialize the score counter
     score = 0
-    
-    # initialize the player and the enemy
-    controller = Controller()
-    playerlist = [ Player(0,0,255/4) , Player(250,100,255/4) , Player(50,100,255/4), Player(200,50,255/4) ]
-    walllist = [ Wall(50,50) ]#, Wall(250,50), Wall(150,250), Wall(200,0), Wall(100,100) ]
 
-    enemy = Enemy()
+    #initialize the level
+    controller = Controller()
+
+    # initialize the player and the enemy
+    playerlist = [ Player(50,50,255/3), Player(150,50,255/3), Player(50,150,255/3) ]
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
     sprite_list = pygame.sprite.Group()
     for player in playerlist:
         sprite_list.add(player)
-    for wall in walllist:
-        sprite_list.add(wall)
-    sprite_list.add(enemy)
-
-    # create a sprite group for enemies only to detect collisions
-    enemy_list = pygame.sprite.Group()
-    enemy_list.add(enemy)
 
     # main game loop
     while 1:
+
         # handle input
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -164,28 +155,13 @@ def event_loop():
                     player.keyboardhandler(event.key)
 
         for player in playerlist:
-            controller.moveCheck(player)
+            controller.move_check(player)
             player.move()
-
-            # detect all collisions between the player and enemy
-            # but don't remove enemy after collisions
-            # increment score if there was a collision
-            if pygame.sprite.spritecollide(player, enemy_list, False):
-                score += 1
         
-        # reverse the movement direction if enemy goes out of bounds
-        if enemy.rect.left < 0 or enemy.rect.right > screen_width:
-            enemy_speed[0] = -enemy_speed[0]
-        if enemy.rect.top < 0 or enemy.rect.bottom > screen_height:
-            enemy_speed[1] = -enemy_speed[1]
-
-        # another way to move rects
-        enemy.rect.x += enemy_speed[0]
-        enemy.rect.y += enemy_speed[1]
-
-
         # black background
         screen.fill((0, 0, 0))
+        background = controller.level.render()
+        screen.blit(background,(0,0))    
 
         # set up the score text
         text = basicFont.render('Score: %d' % score, True, (255, 255, 255))
@@ -210,7 +186,7 @@ def main():
     pygame.init()
 
     # create the window
-    size = width, height = 360, 480
+    size = width, height = 640, 480
     screen = pygame.display.set_mode(size)
 
     # set the window title
