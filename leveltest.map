@@ -39,3 +39,7 @@ death_machine = true
 [L]
 name = laser_switch
 laser_switch = true
+
+[I]
+name = vertical_laser
+vertica_laser = true

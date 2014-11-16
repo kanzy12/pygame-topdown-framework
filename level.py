@@ -103,6 +103,8 @@ class Level(object):
                     tile = 0, 4
                 elif self.get_bool(map_x, map_y, "laser_switch"):
                     tile = 1, 0
+                elif self.get_bool(map_x, map_y, "vertical_laser"):
+                    tile = 1, 1
                 else:
                     #it's ground
                     tile = 0, 0
