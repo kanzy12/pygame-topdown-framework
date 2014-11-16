@@ -33,7 +33,7 @@ class Controller(pygame.sprite.Sprite):
             self.object_map[switch.position] = switch
 
     def move_check(self,player):
-        if (player.moving):
+        if (player.inmotion):
             if not(self.level.is_wall(player.dx/grid,player.dy/grid)):
                 player.nx = player.dx
                 player.ny = player.dy
@@ -109,7 +109,7 @@ def event_loop():
     # initialize the death counter
     deathcount = 0
     deathtransition = 255
-    deathoverlay = pyagme.Surface((650, 500))
+    deathoverlay = pygame.Surface((650, 500))
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
@@ -169,7 +169,7 @@ def event_loop():
         screen.blit(text, textRect)
 
         # draw the death overlay
-        screen.blit(deathoverlay, random.uniform(-1,1)*deathtransition, random.uniform(-1,1)*deathtransition)
+        #screen.blit(deathoverlay, random.uniform(-1,1)*deathtransition, random.uniform(-1,1)*deathtransition)
 
         # draw the player and enemy sprites to the screen
         sprite_list.draw(screen)

@@ -2,6 +2,7 @@ import ConfigParser
 import pygame
 import pygame.locals
 import json
+import os
 
 from objects import *
 
@@ -16,16 +17,17 @@ class Level(object):
         parser.read(filename + ".map")
         self.tileset = parser.get("level", "tileset")
         self.map = parser.get("level", "map").split("\n")
-        
-        json_data=open(filename + ".json")
 
-        data = json.load(json_data)
-        json_data.close()
-
-        switches = []
-        for switch in data["switches"]:
-            new_switch = Switch(switch["position"][0], switch["position"][1], switch["targets"])
-            switches.append(new_switch)
+        #see if json file exists
+        if os.path.isfile(filename + ".json"):
+            json_data=open(filename + ".json")
+            data = json.load(json_data)
+            json_data.close()
+            
+            switches = []
+            for switch in data["switches"]:
+                new_switch = Switch(switch["position"][0], switch["position"][1], switch["targets"])
+                switches.append(new_switch)
 
         self.width = len(self.map[0])
         self.height = len(self.map)
