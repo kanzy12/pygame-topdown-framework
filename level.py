@@ -1,6 +1,9 @@
 import ConfigParser
 import pygame
 import pygame.locals
+import json
+
+from objects import *
 
 #code inspired from tutorial at http://qq.readthedocs.org/en/latest/tiles.html
 
@@ -10,9 +13,19 @@ class Level(object):
         self.players = []
         self.key = {}
         parser = ConfigParser.ConfigParser()
-        parser.read(filename)
+        parser.read(filename + ".map")
         self.tileset = parser.get("level", "tileset")
         self.map = parser.get("level", "map").split("\n")
+        
+        json_data=open(filename + ".json")
+
+        data = json.load(json_data)
+        json_data.close()
+
+        switches = []
+        for switch in data["switches"]:
+            new_switch = Switch(switch["position"][0], switch["position"][1], switch["targets"])
+            switches.append(new_switch)
 
         self.width = len(self.map[0])
         self.height = len(self.map)
@@ -43,7 +56,7 @@ class Level(object):
                 rect = (tile_x * self.tile_width, tile_y * self.tile_height, self.tile_width, self.tile_height)
                 line.append(image.subsurface(rect))
         
-        return self.players, int(self.key["t"]["time"])
+        return self.players, int(self.key["t"]["time"]), switches
         
     def get_tile(self, x, y):
         char = self.map[y][x]
@@ -72,6 +85,8 @@ class Level(object):
                     tile = 0, 1
                 elif self.get_bool(map_x, map_y, "goal"):
                     tile = 0, 2
+                elif self.get_bool(map_x, map_y, "switch"):
+                    tile = 0, 3
                 else:
                     #it's ground
                     tile = 0, 0
