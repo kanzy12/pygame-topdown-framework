@@ -1,7 +1,7 @@
 [level]
 tileset = images/tileset.png
 map = ##########
-      #P.#....S#
+      #P.#P...L#
       #..#.#.#.#
       #..###.#.#
       #S..X..#G#
@@ -35,3 +35,7 @@ switch = true
 [X]
 name = death_machine
 death_machine = true
+
+[L]
+name = laser_switch
+laser_switch = true

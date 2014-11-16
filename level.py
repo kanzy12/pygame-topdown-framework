@@ -28,6 +28,10 @@ class Level(object):
             for switch in data["switches"]:
                 new_switch = Switch(switch["position"][0], switch["position"][1], switch["targets"])
                 switches.append(new_switch)
+                
+            for switch in data["laser_switches"]:
+                new_switch = LaserSwitch(switch["position"][0], switch["position"][1], switch["orientation"], switch["targets"])
+                switches.append(new_switch)
 
         self.width = len(self.map[0])
         self.height = len(self.map)
@@ -97,6 +101,8 @@ class Level(object):
                     tile = 0, 3
                 elif self.get_bool(map_x, map_y, "death_machine"):
                     tile = 0, 4
+                elif self.get_bool(map_x, map_y, "laser_switch"):
+                    tile = 1, 0
                 else:
                     #it's ground
                     tile = 0, 0

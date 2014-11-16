@@ -49,7 +49,7 @@ class Controller(pygame.sprite.Sprite):
                     if isinstance(cur_object, Switch):
                         cur_object.step_off()
                         if cur_object.toggle_changed:
-                            self.switch_changed(cur_object.targets)
+                            self.switch_changed(cur_object, cur_object.targets)
                             cur_object.toggle_changed = False
                 
                 #check if it's goal
@@ -66,7 +66,7 @@ class Controller(pygame.sprite.Sprite):
                         if isinstance(cur_object, Switch):
                             cur_object.step_on()
                             if cur_object.toggle_changed:
-                                self.switch_changed(cur_object.targets)
+                                self.switch_changed(cur_object, cur_object.targets)
                                 cur_object.toggle_changed = False
                         elif isinstance(cur_object, DeathMachine):
                             player.dead = True                
@@ -75,16 +75,41 @@ class Controller(pygame.sprite.Sprite):
                 player.dx = player.rect.x
                 player.dy = player.rect.y
             
-    def switch_changed(self, targets):
-        for target in targets:
-            if self.level.map[target[1]][target[0]] == "#":
-                string = UserString.MutableString(self.level.map[target[1]])
-                string[target[0]] = "."
-                self.level.map[target[1]] = str(string)
-            elif self.level.map[target[1]][target[0]] == ".":
-                string = UserString.MutableString(self.level.map[target[1]])
-                string[target[0]] = "#"
-                self.level.map[target[1]] = str(string)
+    def switch_changed(self, switch, targets):
+        if isinstance(switch, Switch):
+            for target in targets:
+                if self.level.map[target[1]][target[0]] == "#":
+                    string = UserString.MutableString(self.level.map[target[1]])
+                    string[target[0]] = "."
+                    self.level.map[target[1]] = str(string)
+                elif self.level.map[target[1]][target[0]] == ".":
+                    string = UserString.MutableString(self.level.map[target[1]])
+                    string[target[0]] = "#"
+                    self.level.map[target[1]] = str(string)
+                    for player in self.players:
+                        if player.ox / grid == target[0] and player.oy / grid == target[1]:
+                            print "Player Die!"
+                            player.dead = True
+        elif isinstance(switch, LaserSwitch):
+            for target in targets:
+                if switch.orientation == "vertical":
+                    if self.level.map[target[1]][target[0]] == "I":
+                        string = UserString.MutableString(self.level.map[target[1]])
+                        string[target[0]] = "."
+                        self.level.map[target[1]] = str(string)
+                    else:
+                        string = UserString.MutableString(self.level.map[target[1]])
+                        string[target[0]] = "I"
+                        self.level.map[target[1]] = str(string)
+                elif switch.orientation == "horizontal":
+                    if self.level.map[target[1]][target[0]] == "-":
+                        string = UserString.MutableString(self.level.map[target[1]])
+                        string[target[0]] = "."
+                        self.level.map[target[1]] = str(string)
+                    else:
+                        string = UserString.MutableString(self.level.map[target[1]])
+                        string[target[0]] = "-"
+                        self.level.map[target[1]] = str(string)
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
