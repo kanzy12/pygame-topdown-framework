@@ -11,7 +11,6 @@ import random
 
 
 grid = 50
-BLOOD = [200, 50, 0]
 
 class Controller(pygame.sprite.Sprite):
     def __init__(self, level_num):
@@ -136,8 +135,11 @@ def event_loop():
 
     # initialize the death counter
     deathcount = 0
-    deathtransition = 255
-    deathoverlay = pygame.Surface((650, 500))
+    dt = 200
+    deathoverlay = pygame.image.load(os.path.join('images', 'blood.png')).convert()
+    WHITE = [200, 50, 0]
+    s = pygame.Surface((650,500))
+    s.set_colorkey([0,0,0])
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
@@ -161,6 +163,12 @@ def event_loop():
         for player in controller.players:
             controller.move_check(player)
             player.move()
+
+            if not(player.dead):
+                sprite_list.add(player)
+            else:
+                for item in player.snow_list:
+                    pygame.draw.circle(s, WHITE, item[0], item[2])
         
         # if level is complete
         if controller.complete:
@@ -168,31 +176,38 @@ def event_loop():
                 sprite_list.remove(player)
             current_level += 1
             controller = Controller(current_level)
-            for player in controller.players:
-                if not(player.dead):
-                    sprite_list.add(player)              
             continue
         
         # black background
         screen.fill((0, 0, 0))
         background = controller.level.render()
+        
         screen.blit(background,(0,0))    
+
+        text = basicFont.render('#YOLO: %d' % math.ceil(controller.time), True, (255, 255, 255))
+        textRect = text.get_rect()
+        textRect.left = 4
+        textRect.bottom = screen_rect.height
+
+        # draw the player and enemy sprites to the screen
+        screen.blit(s, (0,0))
+        sprite_list.draw(screen)
 
         # display the timer on the bottom left
         if controller.time > 0:
             controller.time -= 0.02222222222
         else:
             controller.time = 0
-            if deathtransition > 0:
-                deathtransition -= 1
+            if dt > 1:
+                dt -= 1
+            else:
+                dt = 0
+            # draw the death overlay
+            deathoverlay.set_alpha( abs(200-dt) )
+            screen.blit(deathoverlay,(0,0))
             for player in controller.players:
                 player.dead = True
 
-        text = basicFont.render('#YOLO: %d' % math.ceil(controller.time), True, (255, 255, 255))
-        textRect = text.get_rect()
-        textRect.left = 4
-        textRect.bottom = screen_rect.height
-        
         # draw the text onto the surface
         screen.blit(text, textRect)
 

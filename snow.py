@@ -30,7 +30,7 @@ snow_list = []
  
 # Loop 50 times and add a snow flake in a random x,y position
 s = pygame.Surface((1000,750))
-for i in range(500):
+for i in range(200):
     x = random.randrange(190, 210)
     y = random.randrange(190, 210)
     sx = random.uniform(-2,2)
