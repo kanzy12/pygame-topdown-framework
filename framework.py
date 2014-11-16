@@ -2,11 +2,13 @@ import pygame
 import math
 import sys
 import os
+import random
 from level import *
 from menu import *
+from player import *
 
 grid = 50
-enemy_speed = [6, 6]
+BLOOD = [200, 50, 0]
 
 class Controller(pygame.sprite.Sprite):
     def __init__(self, level_num):
@@ -34,81 +36,11 @@ class Controller(pygame.sprite.Sprite):
             player.dx = player.rect.x
             player.dy = player.rect.y
 
-class Player(pygame.sprite.Sprite):
-    # constructor for this class
-    def __init__(self,inx,iny,alpha):
-        # call the parent class (Sprite) constructor
-        pygame.sprite.Sprite.__init__(self)
-        # create 50px by 50px surface
-        self.image = pygame.Surface((50, 50))
-        # color the surface cyan
-        self.image.fill((0, 205, 205))
-        #self.image = pygame.image.load(os.path.join('images', 'ball.png'))
-        self.rect = self.image.get_rect()
-        self.image.set_alpha(alpha)
-        #define self variables
-        self.rect.x = inx
-        self.rect.y = iny
-        self.nx = self.rect.x
-        self.ny = self.rect.y
-        self.dx = self.rect.x
-        self.dy = self.rect.y
-        self.myspeed = 10
-        self.moving = False
+class Switch(pygame.sprite.Sprite):
+    def __init__(self):
+        self.occupied = False
+        self.toggle = False
 
-    def left(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dx = self.rect.x - grid
-
-    def right(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dx = self.rect.x + grid
-
-    def up(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dy = self.rect.y - grid
-
-    def down(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.dy = self.rect.y + grid
-
-    def move(self):
-
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.moving = False
-
-        if (self.rect.x < self.nx):
-            self.rect.x += self.myspeed
-        if (self.rect.x > self.nx):
-            self.rect.x -= self.myspeed
-        if (self.rect.y < self.ny):
-            self.rect.y += self.myspeed
-        if (self.rect.y > self.ny):
-            self.rect.y -= self.myspeed
-
-        if (abs(self.rect.x - self.nx) < self.myspeed):
-            self.rect.x = self.nx
-        if (abs(self.rect.y - self.ny) < self.myspeed):
-            self.rect.y = self.ny
-
-#        if not((self.nx % self.grid) == 0):
-#            self.nx = math.floor(self.nx/self.grid)*self.grid
-#            self.rect.x = self.nx
-#        if not((self.ny % self.grid) == 0):
-#            self.ny = math.floor(self.ny/self.grid)*self.grid
-#            self.rect.y = self.ny
-
-    def keyboardhandler(self,key):
-        if self.moving == False:
-            if key == pygame.K_LEFT:
-                self.left()
-            elif key == pygame.K_RIGHT:
-                self.right()
-            elif key == pygame.K_UP:
-                self.up()
-            elif key == pygame.K_DOWN:
-                self.down()
-            self.moving = True
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
@@ -141,12 +73,15 @@ def event_loop():
     basicFont = pygame.font.SysFont(None, 48)
     # initialize a clock
     clock = pygame.time.Clock()
-    # initialize the score counter
-    score = 0
 
     #initialize the level
     current_level = 1
     controller = Controller(1)
+
+    # initialize the death counter
+    deathcount = 0
+    deathtransition = 255
+    deathoverlay = pyagme.Surface((650, 500))
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
@@ -166,18 +101,20 @@ def event_loop():
                 for player in controller.players:
                     player.keyboardhandler(event.key)
 
+        # take keyboard inputs and check where players can move
         for player in controller.players:
             controller.move_check(player)
             player.move()
         
+        # if level is complete
         if controller.complete:
             for player in controller.players:
                 sprite_list.remove(player)
             current_level += 1
             controller = Controller(current_level)
             for player in controller.players:
-                sprite_list.add(player)
-                  
+                if not(player.dead):
+                    sprite_list.add(player)              
             continue
         
         # black background
@@ -190,14 +127,21 @@ def event_loop():
             controller.time -= 0.02222222222
         else:
             controller.time = 0
+            if deathtransition > 0:
+                deathtransition -= 1
+            for player in controller.players:
+                player.dead = True
 
-        text = basicFont.render('Time: %d' % math.ceil(controller.time), True, (255, 255, 255))
+        text = basicFont.render('#YOLO: %d' % math.ceil(controller.time), True, (255, 255, 255))
         textRect = text.get_rect()
         textRect.left = 4
         textRect.bottom = screen_rect.height
         
         # draw the text onto the surface
         screen.blit(text, textRect)
+
+        # draw the death overlay
+        screen.blit(deathoverlay, random.uniform(-1,1)*deathtransition, random.uniform(-1,1)*deathtransition)
 
         # draw the player and enemy sprites to the screen
         sprite_list.draw(screen)
@@ -213,7 +157,7 @@ def main():
     pygame.init()
 
     # create the window
-    size = width, height = 640, 480
+    size = width, height = 650, 500
     screen = pygame.display.set_mode(size)
 
     # set the window title
