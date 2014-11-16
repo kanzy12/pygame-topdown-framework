@@ -18,19 +18,17 @@ class Level(object):
         self.tileset = parser.get("level", "tileset")
         self.map = parser.get("level", "map").split("\n")
 
+        switches = []
+
         #see if json file exists
         if os.path.isfile(filename + ".json"):
             json_data=open(filename + ".json")
             data = json.load(json_data)
             json_data.close()
             
-            switches = []
+            
             for switch in data["switches"]:
                 new_switch = Switch(switch["position"][0], switch["position"][1], switch["targets"])
-                switches.append(new_switch)
-                
-            for switch in data["laser_switches"]:
-                new_switch = LaserSwitch(switch["position"][0], switch["position"][1], switch["orientation"], switch["targets"])
                 switches.append(new_switch)
 
         self.width = len(self.map[0])

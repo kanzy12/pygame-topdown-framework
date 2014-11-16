@@ -1,0 +1,10 @@
+{
+    "switches" : [
+        {
+            "position" : [1, 1],
+            "targets" : [
+                [10, 8]
+            ]            
+        }  
+    ]
+}

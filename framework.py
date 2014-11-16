@@ -9,15 +9,15 @@ from player import *
 from objects import *
 import random
 
-
+start_level = 1
 grid = 50
 
 class Controller(pygame.sprite.Sprite):
     def __init__(self, level_num):
         self.level = Level()
-        #level_string = "level" + str(level_num)
+        level_string = "level" + str(level_num)
         #for testing
-        level_string = "leveltest"
+        #level_string = "leveltest"
         self.complete = False
         self.players = []
         self.playerpositions, self.time, self.switches, self.death_machines = self.level.load_file(level_string)
@@ -130,8 +130,8 @@ def event_loop():
     clock = pygame.time.Clock()
 
     #initialize the level
-    current_level = 1
-    controller = Controller(1)
+    current_level = start_level
+    controller = Controller(current_level)
 
     # initialize the death counter
     deathcount = 0
@@ -172,6 +172,9 @@ def event_loop():
         
         # if level is complete
         if controller.complete:
+            screen.fill((0, 0, 0))
+            s = pygame.Surface((650,500))
+            s.set_colorkey([0,0,0])
             for player in controller.players:
                 sprite_list.remove(player)
             current_level += 1
@@ -190,6 +193,7 @@ def event_loop():
         textRect.bottom = screen_rect.height
 
         # draw the player and enemy sprites to the screen
+        s.set_alpha(200)
         screen.blit(s, (0,0))
         sprite_list.draw(screen)
 
@@ -232,7 +236,7 @@ def main():
     screen = pygame.display.set_mode(size)
 
     # set the window title
-    pygame.display.set_caption("Example Framework")
+    pygame.display.set_caption("YOU CLONELY LIVE ONCE")
 
     # create the menu
     menu = cMenu(50, 50, 20, 5, 'vertical', 100, screen,
@@ -271,7 +275,7 @@ def main():
                 event_loop()
             elif state == 2:
                 # just to demonstrate how to make other options
-                pygame.display.set_caption("y u touch this")
+                pygame.display.set_caption("YOU CLONELY LIVE ONCE: Expert Mode")
                 state = 0
             else:
                 # exit the game and program
