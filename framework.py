@@ -21,7 +21,7 @@ class Controller(pygame.sprite.Sprite):
         level_string = "leveltest"
         self.complete = False
         self.players = []
-        self.playerpositions, self.time, self.switches = self.level.load_file(level_string)
+        self.playerpositions, self.time, self.switches, self.death_machines = self.level.load_file(level_string)
         self.playercount = len(self.playerpositions)
 
         for coordinate in self.playerpositions:
@@ -31,6 +31,8 @@ class Controller(pygame.sprite.Sprite):
         self.object_map = {}
         for switch in self.switches:
             self.object_map[switch.position] = switch
+        for death_machine in self.death_machines:
+            self.object_map[death_machine.position] = death_machine
 
     def move_check(self,player):
         if (player.inmotion):
@@ -66,7 +68,8 @@ class Controller(pygame.sprite.Sprite):
                             if cur_object.toggle_changed:
                                 self.switch_changed(cur_object.targets)
                                 cur_object.toggle_changed = False
-                
+                        elif isinstance(cur_object, DeathMachine):
+                            player.dead = True                
                             
             else:
                 player.dx = player.rect.x

@@ -32,6 +32,8 @@ class Level(object):
         self.width = len(self.map[0])
         self.height = len(self.map)
 
+        death_machines = []
+
         for i in xrange(self.width):
             for j in xrange(self.height):
                 if (self.map[j][i] == "P"):
@@ -39,6 +41,10 @@ class Level(object):
                     
                 if (self.map[j][i] == "G"):
                     self.goal = i, j
+                    
+                if (self.map[j][i] == "X"):
+                    new_death_machine = DeathMachine(i, j)
+                    death_machines.append(new_death_machine)
        
         for section in parser.sections():
             if len(section) == 1:
@@ -58,7 +64,7 @@ class Level(object):
                 rect = (tile_x * self.tile_width, tile_y * self.tile_height, self.tile_width, self.tile_height)
                 line.append(image.subsurface(rect))
         
-        return self.players, int(self.key["t"]["time"]), switches
+        return self.players, int(self.key["t"]["time"]), switches, death_machines
         
     def get_tile(self, x, y):
         char = self.map[y][x]
@@ -89,6 +95,8 @@ class Level(object):
                     tile = 0, 2
                 elif self.get_bool(map_x, map_y, "switch"):
                     tile = 0, 3
+                elif self.get_bool(map_x, map_y, "death_machine"):
+                    tile = 0, 4
                 else:
                     #it's ground
                     tile = 0, 0

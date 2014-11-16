@@ -16,3 +16,7 @@ class Switch:
             self.pressed = False
             self.toggle_changed = True
             print "Switch off!"
+            
+class DeathMachine:
+    def __init__(self, x, y):
+        self.position = (x,y)
