@@ -2,13 +2,13 @@
 tileset = images/tileset.png
 map = ##########
       #P.#....S#
-      #..#.#.#.#
+      #..#P#.#.#
       #..###.#.#
       #S.....#G#
       ##########
 
 [t]
-time = 20
+time = 5
      
 [.]
 name = floor

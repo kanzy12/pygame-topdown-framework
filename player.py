@@ -1,4 +1,6 @@
 import pygame
+import random
+import math
 
 grid = 50
 
@@ -15,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.image.fill((0, 205, 205))
         self.rect = self.image.get_rect()
         self.image.set_alpha(alpha)
+        self.snow_list = []
 
         # define self variables
         self.rect.x = inx
@@ -54,8 +57,16 @@ class Player(pygame.sprite.Sprite):
     def move(self):
         if self.dead:
             self.image.set_alpha( self.image.get_alpha()/2.0 ) # fade out
-            #if not(self.blood):
-                #self.blood = Blood()
+            if not(self.blood):
+                for i in range(500):
+                    self.snow_list.append([[random.randrange(self.rect.x, self.rect.x+50),random.randrange(self.rect.y, self.rect.y+50)],[random.uniform(-2,2)**3,random.uniform(-2,2)**3],random.uniform(1, 3)])
+                self.blood = True
+            for i in range(500):
+                self.snow_list[i][0][0] += self.snow_list[i][1][0]
+                self.snow_list[i][0][1] += self.snow_list[i][1][1]
+                self.snow_list[i][1][0] = self.snow_list[i][1][0]/1.1
+                self.snow_list[i][1][1] = self.snow_list[i][1][1]/1.1
+
 
         if self.can_move:
             self.inmotion = False
