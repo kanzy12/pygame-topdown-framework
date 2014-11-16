@@ -27,3 +27,6 @@ goal = true
 
 [P]
 name = player
+
+[S]
+wall = 0,

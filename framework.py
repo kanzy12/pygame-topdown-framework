@@ -7,9 +7,11 @@ from level import *
 from menu import *
 from player import *
 from objects import *
+import random
+
 
 grid = 50
-enemy_speed = [6, 6]
+BLOOD = [200, 50, 0]
 
 class Controller(pygame.sprite.Sprite):
     def __init__(self, level_num):
@@ -33,7 +35,6 @@ class Controller(pygame.sprite.Sprite):
     def move_check(self,player):
         if (player.moving):
             if not(self.level.is_wall(player.dx/grid,player.dy/grid)):
-            
                 player.nx = player.dx
                 player.ny = player.dy
                 
@@ -81,7 +82,6 @@ class Controller(pygame.sprite.Sprite):
                 string = UserString.MutableString(self.level.map[target[1]])
                 string[target[0]] = "#"
                 self.level.map[target[1]] = str(string)
-                
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
@@ -101,12 +101,15 @@ def event_loop():
     basicFont = pygame.font.SysFont(None, 48)
     # initialize a clock
     clock = pygame.time.Clock()
-    # initialize the score counter
-    score = 0
 
     #initialize the level
     current_level = 1
     controller = Controller(1)
+
+    # initialize the death counter
+    deathcount = 0
+    deathtransition = 255
+    deathoverlay = pyagme.Surface((650, 500))
 
     # create a sprite group for the player and enemy
     # so we can draw to the screen
@@ -126,18 +129,20 @@ def event_loop():
                 for player in controller.players:
                     player.keyboardhandler(event.key)
 
+        # take keyboard inputs and check where players can move
         for player in controller.players:
             controller.move_check(player)
             player.move()
         
+        # if level is complete
         if controller.complete:
             for player in controller.players:
                 sprite_list.remove(player)
             current_level += 1
             controller = Controller(current_level)
             for player in controller.players:
-                sprite_list.add(player)
-                  
+                if not(player.dead):
+                    sprite_list.add(player)              
             continue
         
         # black background
@@ -150,14 +155,21 @@ def event_loop():
             controller.time -= 0.02222222222
         else:
             controller.time = 0
+            if deathtransition > 0:
+                deathtransition -= 1
+            for player in controller.players:
+                player.dead = True
 
-        text = basicFont.render('Time: %d' % math.ceil(controller.time), True, (255, 255, 255))
+        text = basicFont.render('#YOLO: %d' % math.ceil(controller.time), True, (255, 255, 255))
         textRect = text.get_rect()
         textRect.left = 4
         textRect.bottom = screen_rect.height
         
         # draw the text onto the surface
         screen.blit(text, textRect)
+
+        # draw the death overlay
+        screen.blit(deathoverlay, random.uniform(-1,1)*deathtransition, random.uniform(-1,1)*deathtransition)
 
         # draw the player and enemy sprites to the screen
         sprite_list.draw(screen)
@@ -173,7 +185,7 @@ def main():
     pygame.init()
 
     # create the window
-    size = width, height = 640, 480
+    size = width, height = 650, 500
     screen = pygame.display.set_mode(size)
 
     # set the window title

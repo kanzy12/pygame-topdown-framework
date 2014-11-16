@@ -7,14 +7,16 @@ class Player(pygame.sprite.Sprite):
     def __init__(self,inx,iny,alpha):
         # call the parent class (Sprite) constructor
         pygame.sprite.Sprite.__init__(self)
+
         # create 50px by 50px surface
         self.image = pygame.Surface((50, 50))
+
         # color the surface cyan
         self.image.fill((0, 205, 205))
-        #self.image = pygame.image.load(os.path.join('images', 'ball.png'))
         self.rect = self.image.get_rect()
         self.image.set_alpha(alpha)
-        #define self variables
+
+        # define self variables
         self.rect.x = inx
         self.rect.y = iny
         self.nx = self.rect.x
@@ -24,31 +26,41 @@ class Player(pygame.sprite.Sprite):
         self.ox = self.rect.x
         self.oy = self.rect.y
         self.myspeed = 10
-        self.moving = False
+        self.inmotion = False
+        self.dead = False
+
+        # prepare the blood cannon
+        self.blood = False
+
+    def can_move(self):
+        return (self.nx == self.rect.x) and (self.ny == self.rect.y) and not(dead)
 
     def left(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+        if self.can_move:
             self.dx = self.rect.x - grid
 
     def right(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+        if self.can_move:
             self.dx = self.rect.x + grid
 
     def up(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+        if self.can_move:
             self.dy = self.rect.y - grid
 
     def down(self):
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
+        if self.can_move:
             self.dy = self.rect.y + grid
 
     def move(self):
+        if self.dead:
+            self.image.set_alpha( self.image.get_alpha()/2.0 ) # fade out
+            #if not(self.blood):
+                #self.blood = Blood()
 
-        if (self.nx == self.rect.x) and (self.ny == self.rect.y):
-            self.moving = False
+        if self.can_move:
+            self.inmotion = False
             self.ox = self.rect.x
             self.oy = self.rect.y
-
         if (self.rect.x < self.nx):
             self.rect.x += self.myspeed
         if (self.rect.x > self.nx):
@@ -63,15 +75,8 @@ class Player(pygame.sprite.Sprite):
         if (abs(self.rect.y - self.ny) < self.myspeed):
             self.rect.y = self.ny
 
-#        if not((self.nx % self.grid) == 0):
-#            self.nx = math.floor(self.nx/self.grid)*self.grid
-#            self.rect.x = self.nx
-#        if not((self.ny % self.grid) == 0):
-#            self.ny = math.floor(self.ny/self.grid)*self.grid
-#            self.rect.y = self.ny
-
     def keyboardhandler(self,key):
-        if self.moving == False:
+        if self.inmotion == False:
             if key == pygame.K_LEFT:
                 self.left()
             elif key == pygame.K_RIGHT:
@@ -80,4 +85,4 @@ class Player(pygame.sprite.Sprite):
                 self.up()
             elif key == pygame.K_DOWN:
                 self.down()
-            self.moving = True
+            self.inmotion = True
